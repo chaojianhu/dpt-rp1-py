@@ -42,15 +42,15 @@
 
 # nat
 # sudo tunctl -t tap0 -u fiks-hu (host)
-# sudo brctl addif virbr0 tap0 (host)
+# sudo brctl addif xenbr0 tap0 (host)
 # sudo ifconfig tap0 0.0.0.0 up (host)
 # sudo echo 1 > /proc/sys/net/ipv4/ip_forward (host)
 # sudo iptables -t nat -A POSTROUTING -o wlan0 -j MASQUERADE (host)
 # sudo iptables -t filter -A FORWARD -i wlan0 -j ACCEPT (host)
-# sudo ifconfig eth0 192.168.122.25 netmask 255.255.255.0 up (guest)
-# sudo route add default gw 192.168.122.1 (guest) 
+# sudo ifconfig eth0 192.168.168.25 netmask 255.255.255.0 up (guest)
+# sudo route add default gw 192.168.168.1 (guest) 
 # sudo vim /etc/resolv.conf
-# nameserver 192.168.122.1
+# nameserver 192.168.168.1
 
 #sudo iptables -t nat -A POSTROUTING -s "192.168.168.0/255.255.255.0" ! -d "192.168.168.0/255.255.255.0" -j MASQUERADE
 #sudo iptables -t filter -A FORWARD -s "192.168.168.0/255.255.255.0" ! -d "192.168.168.0/255.255.255.0" -j ACCEPT
@@ -59,6 +59,10 @@
 #sudo iptables -t filter -A FORWARD -s "192.168.168.0/255.255.255.0" ! -d "192.168.168.0/255.255.255.0" -i wlan0 -j ACCEPT
 
 #dnsmasq --strict-order --except-interface=lo --interface=br0 --listen-address=192.168.168.1 --bind-interfaces --dhcp-range=192.168.168.200,192.168.168.220 --conf-file="" --pid-file=/var/run/qemu-dhcp-br0.pid --dhcp-leasefile=/var/run/qemu-dhcp-br0.leases --dhcp-no-override
+
+#macaddr parameter is needed for inter-connection between VMs
+#qemu-system-x86_64 -enable-kvm -m 1024 -usb -usbdevice tablet -net nic,macaddr=00:11:22:33:44:66 -net tap,ifname=tap0,script=no,downscript=no centos.qcow2
+#qemu-system-x86_64 -enable-kvm -m 1024 -usb -usbdevice tablet -net nic,macaddr=00:11:22:33:44:88 -net tap,ifname=tap1,script=no,downscript=no ubuntu.qcow2
 
 #-curses
 #-display curses
@@ -384,3 +388,4 @@ if [ "W$1" == "W12" ]
 then
 	kvm -enable-kvm -hda debian2.qcow2 -m 256 -nographic -vnc :12 -monitor telnet::5432,server,nowait -usb -usbdevice tablet -net nic,model=pcnet,macaddr=00:11:22:33:44:66 -net tap,ifname=tap12,script=no,downscript=no
 fi
+
